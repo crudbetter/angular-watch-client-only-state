@@ -1,10 +1,20 @@
 <!DOCTYPE html>
-<html>
+<html ng-app="clientOnlyState">
   <head>
     <title>angular-watch-client-only-state</title>
   </head>
   <body>
+
+  	<div ng-controller="MessageCtrl">
+  	</div>
+
+  	<div ng-controller="DetailCtrl">
+  		<p>{{article.title}} by {{article.author}}</p>
+  	</div>
+
     <script src="bower_components/angular/angular.js"></script>
+    <script src="bower_components/angular-mocks/angular-mocks.js"></script>
+    <script src="bower_components/angular-resource/angular-resource.js"></script>
     <script src="app.js"></script>
     <script src="controllers.js"></script>
     <script src="services.js"></script>
