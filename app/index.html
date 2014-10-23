@@ -8,8 +8,16 @@
   	<div ng-controller="MessageCtrl">
   	</div>
 
-  	<div ng-controller="DetailCtrl">
+    <divi ng-controller="ListCtrl">
+      <ul>
+        <li ng-repeat="article in articles" ng-click="selectArticle(article)">{{article.title}}</li>
+      </ul>
+    </div>
+
+    <div ng-controller="DetailCtrl">
   		<p>{{article.title}} by {{article.author}}</p>
+  		<p>{{article.state}}</p>
+  		<button ng-click="save(article)" ng-disabled="!article">Save</button>
   	</div>
 
     <script src="bower_components/angular/angular.js"></script>
