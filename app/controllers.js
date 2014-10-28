@@ -12,7 +12,9 @@ angular.module('clientOnlyState.controllers')
 		});
 
 		$scope.save = function(article) {
-			article.$save({}, function() {
+			article.$save({}, function success() {
+				console.log(arguments);
+			}, function error() {
 				console.log(arguments);
 			}).then(function() {
 				console.log(arguments); 

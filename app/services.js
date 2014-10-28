@@ -6,7 +6,7 @@ angular.module('clientOnlyState.services')
 		var selectedArticle;
 
 		service.articles = [
-			new Article({ id: 1, title: 'A title', author: 'M Godfrey' }),
+			Article.get({ id: 1 }),
       new Article({ id: 2, title: 'Another title', author: 'J Bloggs' })
 		];
 
@@ -56,16 +56,15 @@ angular.module('clientOnlyState.services')
 			return original.call(article, params, article, function (article) {
 				article.state = ArticleStates.SAVED;
 				success && success(article);
-			}, function(article) {
-				article.state = ArticleStates.ERROR;
+			}, function(response) {
+				response.data.state = ArticleStates.ERROR;
 				error && error(article);
 			});
 		});
 
-
-		return function(data) {
+		return angular.extend(function(data) {
 			var article = new Article(data);
 			article.state = ArticleStates.NONE;
 			return article;
-		}
+		}, Article);
 	});
