@@ -1,35 +1,31 @@
 angular.module('clientOnlyState.controllers')
-
-	.controller('ListCtrl', function($scope, ArticleList) {
-    $scope.articles = ArticleList.articles;
-
-    $scope.selectArticle = ArticleList.setSelectedArticle;
-	})
 	
-	.controller('DetailCtrl', function($scope, ArticleList, $resource, ArticleStates) {
-		$scope.$watch(ArticleList.getSelectedArticle, function(selectedArticle) {
-			$scope.article = selectedArticle;
-		});
+	.controller('ArticleCtrl', function($scope, Article, $resource, ArticleStates) {
+		var article = new Article({ id: 1, title: 'A title', author: 'M Godfrey' });
 
-		$scope.save = function(article) {
-			article.$save({}, function success() {
-				console.log(arguments);
-			}, function error() {
-				console.log(arguments);
-			}).then(function() {
-				console.log(arguments); 
-			});
-		};
+		// Could be injected in...	
+		var translations = {};
+		translations[ArticleStates.SAVED] = 'Saved, oh yeah!';
+		translations['default'] = '';
 
-	})
+    $scope.article = article;
+    $scope.states = ArticleStates;
+    $scope.translations = translations;
 
-	.controller('MessageCtrl', function($scope, ArticleList, ArticleStates) {
-		$scope.$watch(ArticleList.getSelectedArticle, function(article) {
-			$scope.article = article;
-		});
-		$scope.$watch('article.state', function(newState, oldState) {
-			if (newState == ArticleStates.SAVED && oldState ==  ArticleStates.SAVING) {
-				alert("SAVED");
-			}
-		});
+    $scope.save = function() {
+        article.$save({}, function success() {
+            console.log(article.state); // "SAVED"
+        }, function error() {
+            console.log(article.state); // "ERROR"
+        });
+    };  
+
+    $scope.$watch('article.state', function(newState, oldState) {
+    	if (newState == ArticleStates.SAVED && oldState == ArticleStates.SAVING) {
+    		$scope.message = translations[newState];
+    	} else {
+    		$scope.message = translations['default'];
+    	}
+    });
+
 	});

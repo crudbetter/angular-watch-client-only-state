@@ -1,26 +1,5 @@
 angular.module('clientOnlyState.services')
 
-	.factory('ArticleList', function(Article) {
-		var service = {};
-
-		var selectedArticle;
-
-		service.articles = [
-			Article.get({ id: 1 }),
-      new Article({ id: 2, title: 'Another title', author: 'J Bloggs' })
-		];
-
-		service.getSelectedArticle = function() {
-			return selectedArticle;
-		};
-
-		service.setSelectedArticle = function(article) {
-			selectedArticle = article;
-		};
-
-		return service;
-	})
-
 	.value('ArticleStates', {
 		NONE: 'NONE',
 		SAVING: 'SAVING',
@@ -43,28 +22,38 @@ angular.module('clientOnlyState.services')
 	.factory('Article', function($resource, ArticleStates, wrapMethod) {
 		var Article = $resource('/article/:articleId', { articleId: '@id' });
 
-		wrapMethod(Article, 'get', function(original, options) {
-			var article = original(options);
-			article.$promise.then(function(data) {
-				data.state = ArticleStates.NONE;
+		function updateState(article, newState) {
+			article.prevState = article.state;
+			article.state = newState;
+		};
+
+		wrapMethod(Article, 'get', function(original, params) {
+			var article = original(params);
+			article.$promise.then(function(article) {
+				updateState(article, ArticleStates.NONE);
 			});
 			return article;
 		});
 
+    // Consumers will actually call $save with optional params, success and error arguments  
+    // $save consolidates arguments and then calls our wrapper, additionally passing the Resource instance
 		wrapMethod(Article, 'save', function(original, params, article, success, error) {
-			article.state = ArticleStates.SAVING;
-			return original.call(article, params, article, function (article) {
-				article.state = ArticleStates.SAVED;
+			updateState(article, ArticleStates.SAVING);
+			return original.call(this, params, article, function (article) {
+				updateState(article, ArticleStates.SAVED);
 				success && success(article);
 			}, function(response) {
-				response.data.state = ArticleStates.ERROR;
+				updateState(article, ArticleStates.ERROR);
 				error && error(article);
 			});
 		});
 
+    // $resource(...) returns a function that also has methods  
+    // As such we reference Article's own properties via extend  
+    // Which in the case of get and save are already wrapped functions 
 		return angular.extend(function(data) {
 			var article = new Article(data);
-			article.state = ArticleStates.NONE;
+			updateState(article, ArticleStates.NONE);
 			return article;
 		}, Article);
 	});
