@@ -8,24 +8,24 @@ angular.module('clientOnlyState.controllers')
 		translations[ArticleStates.SAVED] = 'Saved, oh yeah!';
 		translations['default'] = '';
 
-    $scope.article = article;
-    $scope.states = ArticleStates;
-    $scope.translations = translations;
+		$scope.article = article;
+		$scope.states = ArticleStates;
+		$scope.translations = translations;
 
-    $scope.save = function() {
-        article.$save({}, function success() {
-            console.log(article.state); // "SAVED"
-        }, function error() {
-            console.log(article.state); // "ERROR"
-        });
-    };  
+		$scope.save = function() {
+			article.$save({}, function success() {
+				console.log(article.state); // "SAVED"
+			}, function error() {
+				console.log(article.state); // "ERROR"
+			});
+		};  
 
-    $scope.$watch('article.state', function(newState, oldState) {
-    	if (newState == ArticleStates.SAVED && oldState == ArticleStates.SAVING) {
-    		$scope.message = translations[newState];
-    	} else {
-    		$scope.message = translations['default'];
-    	}
-    });
+		$scope.$watch('article.state', function(newState, oldState) {
+			if (newState == ArticleStates.SAVED && oldState == ArticleStates.SAVING) {
+				$scope.message = translations[newState];
+			} else {
+				$scope.message = translations['default'];
+			}
+		});
 
 	});
